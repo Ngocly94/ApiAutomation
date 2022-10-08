@@ -35,7 +35,7 @@ public class SendLogInAPISuccessfullySteps {
 	public void i_send_request() {
 		String projectPath = System.getProperty("user.dir");
 		File sourceFile = new File(projectPath + "/src/main/resources/LoginApi/" + requestBodyFileName);
-		File destinationFile = new File(projectPath  + "/src/main/resources/LoginApi/" +"copy"+  requestBodyFileName);
+		File destinationFile = new File(projectPath + "/src/main/resources/LoginApi/" + "copy" + requestBodyFileName);
 		System.out.print(destinationFile);
 		jsonUtils.copyJsonFile(sourceFile, destinationFile);
 		String requestBodyString;
@@ -60,5 +60,4 @@ public class SendLogInAPISuccessfullySteps {
 		assertEquals(actualStatusCode, expectedStatusCode);
         assertEquals(actualToken, expectedToken);
 	}
-
 }

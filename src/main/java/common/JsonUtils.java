@@ -1,12 +1,15 @@
 package common;
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import groovy.transform.Field;
 
 public class JsonUtils {
 
@@ -48,28 +51,29 @@ public class JsonUtils {
 		  
 	}
 	
-	//Pass value by fieldName
+
+	//Pass value by fieldName 
 	public String changeValueByFieldName(File file, String fieldName, String value) {
-		String resultFile = null;
-		String filePath = file.getAbsolutePath();
+		String resultFile = null; 
+		String filePath = file.getAbsolutePath();//Lấy đường dẫn đến file
 		try {
-		String originalFile = new String (Files.readAllBytes(Paths.get(filePath)));
+		String originalFile = new String (Files.readAllBytes(Paths.get(filePath)));//Đọc file từ đường dẫn
 		
 		JSONParser parser = new JSONParser();
-		JSONObject jsonObject = (JSONObject) parser.parse(originalFile);
-		if (value.equals("missing")) {
-			jsonObject.remove(fieldName);
+		JSONObject jsonObject = (JSONObject) parser.parse(originalFile);//Chuyển file sang dạng Json Object
+		if (value.equals("missing")) { //Nếu value miss -> remove fieldname khỏi json object)
+			jsonObject.remove(fieldName); //Đọc value và fieldname ở feature
 		} else if(value.equals("null")) {
 			jsonObject.put(fieldName, null);
 		} else if(value.equals("true")) {
 			jsonObject.put(fieldName, true);
-		} else if (value.equals("\"\"" )) {
+		} else if (value.equals("\"\"" )) { // String 
 			jsonObject.put(fieldName, "");
 		}
 		else {
 		jsonObject.put(fieldName, value);
 		}
-		resultFile=jsonObject.toJSONString();
+		resultFile=jsonObject.toJSONString(); // chuyển về String
 		
 		} catch (Exception e) {
 			System.out.println("File not found");
@@ -78,6 +82,41 @@ public class JsonUtils {
 		return resultFile;
 		
 	}
-	
+	// ChangeValueTwoFields
+	public String changeValueOfMultiField(HashMap<String, String> fieldNameValues, File jsonFile) {
+		String resultFile = null;
+		String filePath = jsonFile.getAbsolutePath();//Lấy đường dẫn đến file
+		try {
+		String originalFile = new String (Files.readAllBytes(Paths.get(filePath)));//Đọc file từ đường dẫn
+		
+		JSONParser parser = new JSONParser();
+		JSONObject jsonObject = (JSONObject) parser.parse(originalFile);
+		for(String i: fieldNameValues.keySet()) {
+			if (fieldNameValues.get(i).equals("missing")) { //Nếu value miss -> remove fieldname khỏi json object)
+				jsonObject.remove(i); //Đọc value và fieldname ở feature
+			} else if(fieldNameValues.get(i).equals("null")) {
+				jsonObject.put(i, null);
+			} else if(fieldNameValues.get(i).equals("true")) {
+				jsonObject.put(i, true);
+			} else if (fieldNameValues.get(i).equals("\"\"" )) { // String 
+				jsonObject.put(i, "");
+			}
+			else {
+			jsonObject.put(i, fieldNameValues.get(i));
+			}
+			
+		}
+		resultFile=jsonObject.toString();
+		}
+		catch (Exception e) {
+			System.out.println("Set value by key fail");
+		}
+		
+		
+		
+		return resultFile;
+		
+	}
+		
 }
-
+	
