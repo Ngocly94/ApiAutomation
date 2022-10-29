@@ -7,10 +7,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
+import org.apache.tools.ant.taskdefs.Delete;
+
+import lombok.experimental.var;
 
 public class ApiUtils {
 
@@ -40,53 +40,61 @@ public class ApiUtils {
 
 			response = HttpClient.newHttpClient().send(request, BodyHandlers.ofString());
 			System.out.println("requestBodyString:" + jsonRequestBody);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Send get request fail");
 		}
 		return response;
 	}
-	 private static HttpRequest.BodyPublisher buildFormDataFromMap(Map<Object, Object> data) {
-	        var builder = new StringBuilder();
-	        for (Map.Entry<Object, Object> entry : data.entrySet()) {
-	            if (builder.length() > 0) {
-	                builder.append("&");
-	            }
-	            builder.append(URLEncoder.encode(entry.getKey().toString(), StandardCharsets.UTF_8));
-	            builder.append("=");
-	            builder.append(URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8));
-	        }
-	        System.out.println(builder.toString());
-	        return HttpRequest.BodyPublishers.ofString(builder.toString());
-	    }
-	 public void sendPost(String name, String job) throws IOException, InterruptedException  {
 
-	        // form parameters
-	        Map<Object, Object> data = new HashMap<>();
-	        data.put("name", name);
-	        data.put("job", job);
-	        data.put("ts", System.currentTimeMillis());
+	// Send POST request w Nobody
+	public HttpResponse<String> sendPostRequestNoBody(String url) {
+		HttpResponse<String> response = null;
+		try {
+			HttpRequest request = HttpRequest.newBuilder().uri(new URI(url)).POST(HttpRequest.BodyPublishers.noBody())// No
+																														// request
+																														// body
+					.build();
+			response = HttpClient.newHttpClient().send(request, BodyHandlers.ofString());
 
-	        HttpRequest request = HttpRequest.newBuilder()
-	                .POST(buildFormDataFromMap(data))
-	                .uri(URI.create("https://reqres.in/api/create"))
-	                .setHeader("User-Agent", "Java 11 HttpClient Bot") // add request header
-	                .header("Content-Type", "application/x-www-form-urlencoded")
-	                .build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Send get request fail");
+		}
+		return response;
+	}
 
-	        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+	// Send DELETE request
+	public HttpResponse<String> sendDeleteRequest(String url) {
+		HttpResponse<String> response = null;
+		var request = HttpRequest.newBuilder().uri(URI.create(url)).header("Content-Type", "application/json").DELETE()
+				.build();
+		
+		try {
+			response = HttpClient.newHttpClient().send(request, BodyHandlers.ofString());
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return response;
 
-	        // print status code
-	     //   System.out.println(response.statusCode());
-
-	        // print response body
-	     //   System.out.println(response.body());
-
-	    }
-	 private final HttpClient httpClient = HttpClient.newBuilder()
-	            .version(HttpClient.Version.HTTP_2)
-	            .build();
-	 
-
+	}
+	
+	// Send PUT request
+	
+	public HttpResponse<String> sendPUTRequest(String url, String jsonRequestBody) {
+		HttpResponse<String> response = null;
+		var request = HttpRequest.newBuilder().uri(URI.create(url)).header("Content-Type", "application/json").PUT(HttpRequest.BodyPublishers.ofString(jsonRequestBody))
+				.build();
+		
+		try {
+			response = HttpClient.newHttpClient().send(request, BodyHandlers.ofString());
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return response;
+	
+}
 }
